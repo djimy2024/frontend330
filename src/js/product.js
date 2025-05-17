@@ -1,11 +1,34 @@
-import { setLocalStorage } from './utils.mjs';
 import ProductData from './ProductData.mjs';
+import { getParam } from "./utils.mjs";
+import ProductDetails from './ProductDetails.mjs';
+
+
+const product = new ProductDetails(productId, dataSource);
 
 const dataSource = new ProductData('tents');
 
+//Retrieve product id in the URL.
+const productId = getParam('product');
+
+product.init();
+
+
+
+
+
+
+
+
+
+
+
+/* Layout the product id in the page.
+document.querySelector('main').innerHTML = `<p>Product ID: ${productId}</p>`;
+console.log(dataSource.findProductById(productId));
+
 /*function addProductToCart(product) {
   setLocalStorage('so-cart', product);
-}*/
+}
 
 function addProductToCart(product) {
   // Get current cart or initialize an empty array
@@ -26,4 +49,4 @@ async function addToCartHandler(e) {
 // add listener to Add to Cart button
 document
   .getElementById('addToCart')
-  .addEventListener('click', addToCartHandler);
+  .addEventListener('click', addToCartHandler);*/
