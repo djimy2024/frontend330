@@ -1,5 +1,6 @@
 import ProductData from './ProductData.mjs';
 import ProductList from './ProductList.mjs';
+import { loadHeaderFooter } from "./utils.mjs";
 
 // Create an instance of ProductData
 const dataSource = new ProductData('tents');
@@ -12,6 +13,9 @@ const myProductList = new ProductList('tents', dataSource, listElement);
 
 // Initialize product display
 myProductList.init();
+
+// Call and load the header and footer
+loadHeaderFooter();
 
 // Display data in the console for verification
 dataSource.getData().then((data) => {
