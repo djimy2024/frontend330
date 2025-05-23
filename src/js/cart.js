@@ -1,17 +1,11 @@
-import { getLocalStorage } from './utils.mjs';
-import { loadHeaderFooter } from '/js/utils.js';
-import ShoppingCart from '/js/ShoppingCart.mjs';
+import { getLocalStorage, loadHeaderFooter } from "./utils.mjs";
 
 loadHeaderFooter();
 
-const listElement = document.querySelector('#cart-items');
-const cart = new ShoppingCart('so-cart', listElement);
-cart.renderCartList();
-
 function renderCartContents() {
-  const cartItems = getLocalStorage('so-cart');
+  const cartItems = getLocalStorage("so-cart");
   const htmlItems = cartItems.map((item) => cartItemTemplate(item));
-  document.querySelector('.product-list').innerHTML = htmlItems.join('');
+  document.querySelector(".product-list").innerHTML = htmlItems.join("");
 }
 
 function cartItemTemplate(item) {
