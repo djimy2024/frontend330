@@ -275,6 +275,22 @@ button {
   font-weight: 600;
 }
 
+.btn-cart {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff; 
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cart:hover {
+  background-color: #0056b3; 
+}
+
+
 @media screen and (min-width: 500px) {
   body {
     max-width: 1080px;
