@@ -1,46 +1,25 @@
-import { loadHeaderFooter, getLocalStorage, formDataToJSON } from "./utils.mjs";
+import { loadHeaderFooter } from "./utils.mjs";
 import CheckoutProcess from "./CheckoutProcess.mjs";
-import ExternalServices from "./ExternalServices.mjs"; 
 
 loadHeaderFooter();
 
+const myCheckout = new CheckoutProcess("so-cart", ".checkout-summary");
+myCheckout.init();
 
-const checkout = new CheckoutProcess("so-cart", "#orderSummary");
-checkout.init();
+document
+  .querySelector("#zip")
+  .addEventListener("blur", myCheckout.calculateOrdertotal.bind(myCheckout));
+// listening for click on the button
+document.querySelector("#checkoutSubmit").addEventListener("click", (e) => {
+  e.preventDefault();
 
-
-function packageItems(items) {
-  return items.map(item => ({
-    id: item.Id || item.id,
-    name: item.Name || item.name,
-    price: item.FinalPrice || item.price,
-    quantity: item.quantity
-  }));
-}
-
-
-document.querySelector('#checkout-form')?.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const form = event.target;
-
-  const order = formDataToJSON(form);
-  const items = getLocalStorage("so-cart");
-
-  order.orderDate = new Date().toISOString();
-  order.items = packageItems(items);
-  order.shipping = 12;
-
-  const subtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  order.tax = (subtotal * 0.06).toFixed(2);
-  order.orderTotal = (subtotal + parseFloat(order.tax) + order.shipping).toFixed(2);
-
-  try {
-    const result = await new ExternalServices().checkout(order);
-    console.log("Order response:", result);
-    alert("Order submitted successfully!");
-   
-  } catch (err) {
-    console.error("Checkout failed:", err);
-    alert("Order submission failed.");
-  }
+  myCheckout.checkout();
 });
+
+// this is how it would look if we listen for the submit on the form
+// document.forms['checkout']
+// .addEventListener('submit', (e) => {
+//   e.preventDefault();
+//   // e.target would contain our form in this case
+//    myCheckout.checkout();
+// });

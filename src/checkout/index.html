@@ -1,11 +1,8 @@
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Sleep Outside | Checkout</title>
 
     <link rel="stylesheet" href="/css/style.css" />
@@ -14,36 +11,52 @@
   </head>
 
   <body>
-     <div id="main-header"></div>
+    <div id="main-header"></div>
 
-    <main class="divider">
+    <main id="main-content">
+      <h2>Review & Place your Order</h2>
+
       <div class="checkout-container">
-       <form id="checkout-form">
-  <input name="fname" value="John" />
-  <input name="lname" value="Doe" />
-  <input name="street" value="123 Main" />
-  <input name="city" value="Rexburg" />
-  <input name="state" value="ID" />
-  <input name="zip" value="83440" />
-  <input name="cardNumber" value="1234123412341234" />
-  <input name="expiration" value="12/26" />
-  <input name="code" value="123" />
-  <button type="submit">Submit Order</button>
-</form>
+        <form id="checkout-form">
+          <label for="fname">First Name</label>
+          <input name="fname" id="fname" required />
+
+          <label for="lname">Last Name</label>
+          <input name="lname" id="lname" required />
+
+          <label for="street">Street Address</label>
+          <input name="street" id="street" required />
+
+          <label for="city">City</label>
+          <input name="city" id="city" required />
+
+          <label for="state">State</label>
+          <input name="state" id="state" required />
+
+          <label for="zip">Zip Code</label>
+          <input name="zip" id="zip" required />
+
+          <label for="cardNumber">Card Number</label>
+          <input name="cardNumber" id="cardNumber" required />
+
+          <label for="expiration">Expiration Date</label>
+          <input name="expiration" id="expiration" required />
+
+          <label for="code">Security Code</label>
+          <input name="code" id="code" required />
+
+          <button type="submit" id="checkoutSubmit">Submit Order</button>
+        </form>
       </div>
-    <section id="orderSummary">
-    <div><span>Subtotal:</span> <span id="subtotal">$0.00</span></div>
-    <div><span>Tax:</span> <span id="tax">$0.00</span></div>
-    <div><span>Shipping:</span> <span id="shipping">$0.00</span></div>
-    <div><strong>Total:</strong> <strong id="total">$0.00</strong></div>
-  </section>
-</div>
-  </main>
-      <section class="products">
-        <h2>Review & Place your Order</h2>
+
+      <section id="orderSummary">
+        <div><span>Subtotal:</span> <span id="subtotal">$0.00</span></div>
+        <div><span>Tax:</span> <span id="tax">$0.00</span></div>
+        <div><span>Shipping:</span> <span id="shipping">$0.00</span></div>
+        <div><strong>Total:</strong> <strong id="total">$0.00</strong></div>
       </section>
     </main>
 
-   <div id="main-footer"></div>
+    <div id="main-footer"></div>
   </body>
 </html>

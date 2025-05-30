@@ -1,41 +1,37 @@
 import { renderListWithTemplate } from "./utils.mjs";
 
 function productCardTemplate(product) {
-  const link = product.WebUrl ?? `/product_pages/?product=${product.Id}`;
-  const image = product.Images?.PrimaryMedium ?? product.Image ?? "../images/no-image.png";
-  const price = product.FinalPrice ? `$${product.FinalPrice}` : "Price not available";
-  const brand = product.Brand?.Name ?? "No Brand";
-
-  return `
-    <li class="product-card">
-      <a href="${link}" target="_blank">
-        <img src="${image}" alt="${product.Name}">
-        <h3>${brand}</h3>
-        <p>${product.NameWithoutBrand}</p>
-        <p class="product-card__price">${price}</p>
-      </a>
-    </li>
-  `;
+  return `<li class="product-card">
+  <a href="/product_pages/index.html?product=${product.Id}">
+  <img
+    src="${product.Images.PrimaryMedium}"
+    alt="Image of ${product.Name}"
+  />
+  <h3 class="card__brand">${product.Brand.Name}</h3>
+  <h2 class="card__name">${product.Name}</h2>
+  <p class="product-card__price">$${product.FinalPrice}</p></a>
+</li>`;
 }
-
-
-
 
 export default class ProductList {
   constructor(category, dataSource, listElement) {
+    // We passed in this information to make our class as reusable as possible.
+    // Being able to define these things when we use the class will make it very flexible
     this.category = category;
     this.dataSource = dataSource;
     this.listElement = listElement;
   }
-
   async init() {
+    // our dataSource will return a Promise...so we can use await to resolve it.
     const list = await this.dataSource.getData(this.category);
-    console.log("Fetched product list:", list); // Log pou verifye si done parèt
+    // render the list
     this.renderList(list);
-    document.querySelector(".title").textContent = this.category;
+    //set the title to the current category
+    document.querySelector(".title").innerHTML = this.category;
   }
-
+  // render after doing the first stretch
   renderList(list) {
     renderListWithTemplate(productCardTemplate, this.listElement, list);
   }
+
 }
