@@ -1,0 +1,61 @@
+/* Checkout form container */
+.checkout-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Form labels and inputs */
+.checkout-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.checkout-container input,
+.checkout-container select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Submit button */
+.checkout-container button[type="submit"],
+.checkout-container #checkoutBtn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #1d72b8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-container button[type="submit"]:hover,
+.checkout-container #checkoutBtn:hover {
+  background-color: #145a86;
+}
+
+/* Order summary section */
+#orderSummary {
+  margin-top: 2rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+  font-size: 1rem;
+}
+
+#orderSummary div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}

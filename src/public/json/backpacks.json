@@ -10,6 +10,8 @@
     {
       "Id": "223RN",
       "IsClearance": false,
+  "FinalPrice": 199.99,
+  "Brand": { "Name": "Gregory" },
       "IsNew": false,
       "Url": "/api/1.0/product/223rn/",
       "WebUrl": "https://www.sierra.com/product/bounce/223rn/?filterString=s~backpacks%2F",

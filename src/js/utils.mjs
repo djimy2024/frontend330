@@ -1,3 +1,7 @@
+export function formDataToJSON(formElement) {
+  const formData = new FormData(formElement);
+  return Object.fromEntries(formData.entries());
+}
 
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);

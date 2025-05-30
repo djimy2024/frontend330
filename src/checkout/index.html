@@ -8,73 +8,36 @@
 
     <title>Sleep Outside | Checkout</title>
 
-    <link rel="stylesheet" href="css/style.css" />
-    <script type="module" src="js/checkout.js"></script>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/checkout.css" />
+    <script type="module" src="/js/checkout.js"></script>
   </head>
 
   <body>
      <div id="main-header"></div>
 
     <main class="divider">
-       <form id="checkoutForm">
-      <fieldset>
-        <legend>Customer Name</legend>
-        <label>
-          First Name:
-          <input type="text" name="firstName" required />
-        </label>
-        <label>
-          Last Name:
-          <input type="text" name="lastName" required />
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>Address</legend>
-        <label>
-          Street Address:
-          <input type="text" name="street" required />
-        </label>
-        <label>
-          City:
-          <input type="text" name="city" required />
-        </label>
-        <label>
-          State:
-          <input type="text" name="state" required />
-        </label>
-        <label>
-          Zip Code:
-          <input type="text" name="zip" required />
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>Payment Information</legend>
-        <label>
-          Credit Card Number:
-          <input type="text" name="ccNumber" required />
-        </label>
-        <label>
-          Expiration Date:
-          <input type="month" name="expDate" required />
-        </label>
-        <label>
-          Security Code:
-          <input type="text" name="secCode" required />
-        </label>
-      </fieldset>
-
-      <button type="submit">Checkout</button>
-    </form>
-
-    <aside id="orderSummary">
-      <h2>Order Summary</h2>
-      <p>Subtotal: $<span id="subtotal">0.00</span></p>
-      <p>Tax (5%): $<span id="tax">0.00</span></p>
-      <p>Shipping: $<span id="shipping">5.00</span></p>
-      <p><strong>Total: $<span id="total">0.00</span></strong></p>
-    </aside>
+      <div class="checkout-container">
+       <form id="checkout-form">
+  <input name="fname" value="John" />
+  <input name="lname" value="Doe" />
+  <input name="street" value="123 Main" />
+  <input name="city" value="Rexburg" />
+  <input name="state" value="ID" />
+  <input name="zip" value="83440" />
+  <input name="cardNumber" value="1234123412341234" />
+  <input name="expiration" value="12/26" />
+  <input name="code" value="123" />
+  <button type="submit">Submit Order</button>
+</form>
+      </div>
+    <section id="orderSummary">
+    <div><span>Subtotal:</span> <span id="subtotal">$0.00</span></div>
+    <div><span>Tax:</span> <span id="tax">$0.00</span></div>
+    <div><span>Shipping:</span> <span id="shipping">$0.00</span></div>
+    <div><strong>Total:</strong> <strong id="total">$0.00</strong></div>
+  </section>
+</div>
   </main>
       <section class="products">
         <h2>Review & Place your Order</h2>

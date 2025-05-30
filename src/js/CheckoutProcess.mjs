@@ -1,4 +1,5 @@
-import { getLocalStorage } from "../utils.mjs";
+import { getLocalStorage } from "./utils.mjs";
+
 
 export default class CheckoutProcess {
   constructor(key, outputSelector) {

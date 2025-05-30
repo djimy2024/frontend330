@@ -1,5 +1,6 @@
-import { loadHeaderFooter } from "./utils.mjs";
+import { loadHeaderFooter, getLocalStorage, formDataToJSON } from "./utils.mjs";
 import CheckoutProcess from "./CheckoutProcess.mjs";
+import ExternalServices from "./ExternalServices.mjs"; 
 
 loadHeaderFooter();
 
@@ -7,26 +8,39 @@ loadHeaderFooter();
 const checkout = new CheckoutProcess("so-cart", "#orderSummary");
 checkout.init();
 
-document.querySelector("#zip").addEventListener("blur", () => {
-  checkout.calculateOrderTotal();
-});
+
+function packageItems(items) {
+  return items.map(item => ({
+    id: item.Id || item.id,
+    name: item.Name || item.name,
+    price: item.FinalPrice || item.price,
+    quantity: item.quantity
+  }));
+}
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const subtotal = parseFloat(localStorage.getItem("cartSubtotal")) || 0;
-  const tax = +(subtotal * 0.05).toFixed(2);
-  const shipping = 5.0;
-  const total = +(subtotal + tax + shipping).toFixed(2);
+document.querySelector('#checkout-form')?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = event.target;
 
-  document.getElementById("subtotal").textContent = subtotal.toFixed(2);
-  document.getElementById("tax").textContent = tax.toFixed(2);
-  document.getElementById("shipping").textContent = shipping.toFixed(2);
-  document.getElementById("total").textContent = total.toFixed(2);
-});
+  const order = formDataToJSON(form);
+  const items = getLocalStorage("so-cart");
 
-document.getElementById("checkoutForm").addEventListener("submit", function (e) {
-  if (!this.checkValidity()) {
-    e.preventDefault(); // Block form submission if invalid
-    alert("Please fill out all fields.");
+  order.orderDate = new Date().toISOString();
+  order.items = packageItems(items);
+  order.shipping = 12;
+
+  const subtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  order.tax = (subtotal * 0.06).toFixed(2);
+  order.orderTotal = (subtotal + parseFloat(order.tax) + order.shipping).toFixed(2);
+
+  try {
+    const result = await new ExternalServices().checkout(order);
+    console.log("Order response:", result);
+    alert("Order submitted successfully!");
+   
+  } catch (err) {
+    console.error("Checkout failed:", err);
+    alert("Order submission failed.");
   }
 });
