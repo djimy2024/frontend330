@@ -1,11 +1,24 @@
-import { loadHeaderFooter, getParam } from "./utils.mjs";
+import { getParam, loadHeaderFooter } from "./utils.mjs";
 import ExternalServices from "./ExternalServices.mjs";
-import ProductList from "./ProductList.mjs";
 
-loadHeaderFooter();
-const category = getParam("category");
-const dataSource = new ExternalServices();
-const element = document.querySelector(".product-list");
-const listing = new ProductList(category, dataSource, element);
+export default class ProductDetails {
+  constructor(productId, dataSource, element) {
+    this.productId = productId;
+    this.dataSource = dataSource;
+    this.element = element;
+  }
 
-listing.init();
+  async init() {
+    const product = await this.dataSource.findProductById(this.productId);
+    this.renderProductDetails(product);
+  }
+
+  renderProductDetails(product) {
+    this.element.innerHTML = `
+      <h2>${product.Name}</h2>
+      <img src="${product.Images.PrimaryLarge}" alt="${product.Name}" />
+      <p>${product.DescriptionHtmlSimple}</p>
+      <p>Price: $${product.FinalPrice}</p>
+    `;
+  }
+}

@@ -4,8 +4,9 @@ import ProductDetails from "./ProductDetails.mjs";
 
 loadHeaderFooter();
 
-const dataSource = new ExternalServices("tents");
 const productId = getParam("product");
+const dataSource = new ExternalServices();
+const element = document.querySelector(".product-detail");
 
-const product = new ProductDetails(productId, dataSource);
+const product = new ProductDetails(productId, dataSource, element);
 product.init();
