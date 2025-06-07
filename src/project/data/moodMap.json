@@ -1,0 +1,6 @@
+{
+  "happy": ["pop", "dance", "electronic"],
+  "sad": ["acoustic", "piano", "indie"],
+  "angry": ["rock", "metal", "punk"],
+  "neutral": ["chill", "ambient", "lo-fi"]
+}

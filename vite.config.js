@@ -1,9 +1,17 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
-  root: 'src/',
+//export default defineConfig({
+  //root: 'src',
 
+export default defineConfig({
+  root: 'src/project',
+ build: {
+    outDir: '../../dist', 
+  },
+});
+
+  /*
  build: {
   outDir: "../dist",
   rollupOptions: {
@@ -13,9 +21,10 @@ export default defineConfig({
       checkout: resolve(__dirname, "src/checkout/index.html"),
       product: resolve(__dirname, "src/product_pages/index.html"),
       productListing: resolve(__dirname, "src/product_listing/index.html"
+
       ),
 
     },
   },
 },
-});
+});*/
