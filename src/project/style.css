@@ -118,6 +118,16 @@ button:hover {
   font-weight: 500;
 }
 
+footer {
+  text-align: center;
+  align-items: center;
+  background: #3f3d56;
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  justify-content: space-between;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   header {
