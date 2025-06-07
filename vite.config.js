@@ -5,9 +5,11 @@ import { defineConfig } from 'vite';
   //root: 'src',
 
 export default defineConfig({
+   base: '/frontend330/',
   root: 'src/project',
  build: {
     outDir: '../../dist', 
+    emptyOutDir: true,
   },
 });
 
