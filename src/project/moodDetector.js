@@ -4,31 +4,36 @@ export async function detectMoodFromWebcam() {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
-  const imageData = canvas.toDataURL('image/jpeg');
-  console.log("Detecting mood...");
 
-  const response = await fetch('https://<your-region>.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceAttributes=emotion', {
-    method: 'POST',
-    headers: {
-      'Ocp-Apim-Subscription-Key': 'YOUR_AZURE_KEY',
-      'Content-Type': 'application/octet-stream'
-    },
-    body: dataURItoBlob(imageData)
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(async (blob) => {
+      try {
+        console.log("Detecting mood...");
+        const response = await fetch('https://eastus.api.cognitiveservices.azure.com/face/v1.0/detect?returnFaceAttributes=emotion', {
+          method: 'POST',
+          headers: {
+            'Ocp-Apim-Subscription-Key': '4394574b-bd33-4283-81dc-d6f9ca4a41f3',
+            'Content-Type': 'application/octet-stream'
+          },
+          body: blob
+        });
+
+        const result = await response.json();
+
+        if (!result || result.length === 0) {
+          alert("No face detected. Please ensure your face is visible in the camera.");
+          return resolve("neutral");
+        }
+
+        const emotions = result[0].faceAttributes.emotion;
+        const mood = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
+        resolve(mood);
+
+      } catch (err) {
+        console.error("Mood detection error:", err);
+        alert("Error detecting mood.");
+        resolve("neutral");
+      }
+    }, 'image/jpeg');
   });
-
-  const result = await response.json();
-  const emotions = result[0]?.faceAttributes?.emotion || {};
-  const mood = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
-  return mood;
-}
-
-function dataURItoBlob(dataURI) {
-  const byteString = atob(dataURI.split(',')[1]);
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: mimeString });
 }

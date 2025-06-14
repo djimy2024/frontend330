@@ -1,3 +1,4 @@
 export function getSelectedMood() {
-  return document.getElementById('mood-select').value;
+ const select = document.getElementById('mood-select');
+  return select.value;
 }
