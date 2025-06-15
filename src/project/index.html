@@ -1,48 +1,42 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Music & Mood Matcher</title>
-  <link rel="stylesheet" href="./style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Roboto&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>🎶 Music & Mood Matcher</h1>
-  <button id="spotify-login">Login with Spotify</button>
-<button id="spotify-logout" style="display:none;">Logout</button>
-
-
+    <h1>Music & Mood Matcher</h1>
+    <p>Let your mood choose your music 🎧</p>
   </header>
 
   <main>
-    <section id="mood-detection">
-      <h2>Detect Your Mood</h2>
-      <video id="webcam" autoplay playsinline width="320" height="240"></video>
-      <button id="detect-mood">Detect Mood</button>
-    </section>
+    <video id="webcam" autoplay muted playsinline style="width: 300px; border: 4px solid #4FC3F7; border-radius: 1rem;"></video>
+    
+    <div class="controls">
+      <button id="loginBtn">Login with Spotify</button>
+      <button id="startBtn" disabled>Start Mood Detection</button>
+    </div>
 
-    <section id="manual-mood">
-      <h2>Or Select a Mood</h2>
-      <select id="mood-select">
-        <option value="happy">Happy</option>
-        <option value="sad">Sad</option>
-        <option value="angry">Angry</option>
-        <option value="neutral">Neutral</option>
-      </select>
-      <button id="generate-playlist">Generate Playlist</button>
-    </section>
+    <div id="loader" class="loader" style="display:none;">🎵 Generating your playlist...</div>
+    <div id="moodResult" style="display:none;"></div>
+    <div id="playlistContainer"></div>
 
-    <section id="playlist-display">
-      <h2>Your Playlist</h2>
-      <p id="detected-mood">Mood: --</p>
-      <div id="playlist" class="playlist-container"></div>
-    </section>
+    <div>
+  <h3>Or pick your mood manually:</h3>
+  <div id="moodSelector"></div>
+</div>
   </main>
 
-  <script type="module" src="./main.js"></script>
+  <footer>
+    <p>&copy; 2025 Djimy Francillon 
+   -- Frontend330/Final Project</p>
+  </footer>
 
-  <footer>&copy; 2025 Djimy Francillon 
-   -- Frontend330/Final Project</footer>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

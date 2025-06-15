@@ -1,6 +1,10 @@
 export function showMood(mood) {
-  document.getElementById('detected-mood').textContent = `Mood: ${mood}`;
+  const moodDisplay = document.getElementById('detected-mood');
+  moodDisplay.textContent = `Mood: ${mood}`;
+  moodDisplay.className = ''; 
+  moodDisplay.classList.add(`mood-${mood}`); 
 }
+
 
 export function displayPlaylist(tracks) {
   const container = document.getElementById('playlist');

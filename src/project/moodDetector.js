@@ -1,39 +1,50 @@
-export async function detectMoodFromWebcam() {
-  const video = document.getElementById('webcam');
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
+// moodDetector.js
+const azureEndpoint = "https://YOUR_REGION.api.cognitive.microsoft.com/face/v1.0/detect";
+const azureKey = "YOUR_AZURE_FACE_API_KEY";
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(async (blob) => {
-      try {
-        console.log("Detecting mood...");
-        const response = await fetch('https://eastus.api.cognitiveservices.azure.com/face/v1.0/detect?returnFaceAttributes=emotion', {
-          method: 'POST',
-          headers: {
-            'Ocp-Apim-Subscription-Key': '4394574b-bd33-4283-81dc-d6f9ca4a41f3',
-            'Content-Type': 'application/octet-stream'
-          },
-          body: blob
-        });
+export async function startWebcam(videoElement) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoElement.srcObject = stream;
+    await videoElement.play();
+  } catch (err) {
+    console.error("Webcam error:", err);
+    alert("Could not access webcam");
+  }
+}
 
-        const result = await response.json();
+export async function captureSnapshot(videoElement) {
+  const canvas = document.createElement("canvas");
+  canvas.width = videoElement.videoWidth;
+  canvas.height = videoElement.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(videoElement, 0, 0);
+  return canvas.toDataURL("image/jpeg");
+}
 
-        if (!result || result.length === 0) {
-          alert("No face detected. Please ensure your face is visible in the camera.");
-          return resolve("neutral");
-        }
+export async function detectMoodFromImage(base64Image) {
+  const blob = await fetch(base64Image).then(res => res.blob());
 
-        const emotions = result[0].faceAttributes.emotion;
-        const mood = Object.keys(emotions).reduce((a, b) => emotions[a] > emotions[b] ? a : b);
-        resolve(mood);
-
-      } catch (err) {
-        console.error("Mood detection error:", err);
-        alert("Error detecting mood.");
-        resolve("neutral");
-      }
-    }, 'image/jpeg');
+  const params = new URLSearchParams({
+    returnFaceAttributes: "emotion"
   });
+
+  const response = await fetch(`${azureEndpoint}?${params}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/octet-stream",
+      "Ocp-Apim-Subscription-Key": azureKey
+    },
+    body: await blob.arrayBuffer()
+  });
+
+  const data = await response.json();
+
+  if (!data.length) {
+    throw new Error("No face detected");
+  }
+
+  const emotions = data[0].faceAttributes.emotion;
+  const topEmotion = Object.entries(emotions).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+  return topEmotion;
 }

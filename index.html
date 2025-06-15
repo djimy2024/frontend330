@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Music & Mood Matcher</title>
+  <style>
+    body {
+      background-color: #F9F9F9;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    video {
+      border: 5px solid #4FC3F7;
+      border-radius: 10px;
+      width: 320px;
+      height: 240px;
+    }
+    button {
+      margin-top: 1rem;
+      background-color: #4FC3F7;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3F3D56;
+    }
+    #loader {
+      margin-top: 1rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎵 Mood & Music Matcher</h1>
+  <video id="webcam" autoplay></video><br>
+  <button onclick="detectMoodAndCreatePlaylist()">Detect Mood & Generate Playlist</button>
+
+  <div id="loader">⏳ Processing...</div>
+
+  <script>
+    // Start camera
+    const video = document.getElementById('webcam');
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => console.error("Camera error:", err));
+
+    // Take photo from webcam
+    async function captureImageBlob() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      return await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+    }
+
+    // Call Azure Face API
+    async function getMoodFromAzure(blob) {
+      const subscriptionKey = "YOUR_AZURE_FACE_API_KEY";
+      const endpoint = "https://YOUR_REGION.api.cognitive.microsoft.com/face/v1.0/detect";
+
+      const url = `${endpoint}?returnFaceAttributes=emotion`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": subscriptionKey,
+          "Content-Type": "application/octet-stream"
+        },
+        body: blob
+      });
+
+      const data = await res.json();
+      if (!data[0]) throw new Error("No face detected.");
+
+      const emotions = data[0].faceAttributes.emotion;
+      let mood = Object.entries(emotions).reduce((max, curr) => curr[1] > max[1] ? curr : max)[0];
+      return mood;
+    }
+
+    const moodToGenre = {
+      happy: "pop",
+      sad: "acoustic",
+      angry: "metal",
+      relaxed: "chill",
+      surprised: "electronic",
+      fearful: "ambient",
+      neutral: "indie"
+    };
+
+    function getGenreFromMood(mood) {
+      return moodToGenre[mood] || "pop";
+    }
+
+    async function searchTracksByGenre(genre, token) {
+      const res = await fetch(`https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=20`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      return data.tracks.items.map(t => t.uri);
+    }
+
+    async function createPlaylist(userId, mood, token) {
+      const res = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: `Mood: ${mood}`,
+          description: "Generated with Mood Matcher",
+          public: false
+        })
+      });
+      const playlist = await res.json();
+      return playlist.id;
+    }
+
+    async function addTracksToPlaylist(playlistId, uris, token) {
+      await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ uris })
+      });
+    }
+
+    async function detectMoodAndCreatePlaylist() {
+      const loader = document.getElementById("loader");
+      loader.style.display = "block";
+
+      const accessToken = localStorage.getItem("spotify_access_token");
+      if (!accessToken) return alert("Please log in to Spotify.");
+
+      try {
+        const blob = await captureImageBlob();
+        const detectedMood = await getMoodFromAzure(blob);
+        alert("Detected mood: " + detectedMood);
+
+        const genre = getGenreFromMood(detectedMood);
+        const tracks = await searchTracksByGenre(genre, accessToken);
+
+        const profileRes = await fetch("https://api.spotify.com/v1/me", {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const profile = await profileRes.json();
+
+        const playlistId = await createPlaylist(profile.id, detectedMood, accessToken);
+        await addTracksToPlaylist(playlistId, tracks, accessToken);
+
+        alert("✅ Playlist created! Check your Spotify.");
+      } catch (err) {
+        console.error(err);
+        alert("❌ " + err.message);
+      } finally {
+        loader.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>

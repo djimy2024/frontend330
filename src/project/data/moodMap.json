@@ -1,6 +1,10 @@
 {
-  "happy": ["pop", "dance", "electronic"],
-  "sad": ["acoustic", "piano", "indie"],
-  "angry": ["rock", "metal", "punk"],
-  "neutral": ["chill", "ambient", "lo-fi"]
+  "happy": ["pop", "dance", "electropop"],
+  "sad": ["acoustic", "piano", "ambient"],
+  "angry": ["metal", "hard-rock", "punk"],
+  "neutral": ["chill", "indie-pop", "trip-hop"],
+  "surprised": ["electronic", "house", "techno"],
+  "fearful": ["ambient", "minimal", "experimental"],
+  "disgusted": ["industrial", "dark-electro"],
+  "contempt": ["alternative", "lo-fi", "emo"]
 }

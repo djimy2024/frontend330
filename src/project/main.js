@@ -1,34 +1,67 @@
-import { fetchAccessToken, getAccessToken, initButtons } from './auth.js';
-import { detectMoodFromWebcam } from './moodDetector.js';
-import { getSelectedMood } from './moodSelector.js';
-import { generatePlaylist } from './playlistGenerator.js';
-import { displayPlaylist, showMood } from './display.js';
+// main.js
+import { loginWithSpotify, getAccessToken } from "./auth.js";
+import { startWebcam, captureSnapshot, detectMoodFromImage } from "./moodDetector.js";
+import { loadMoodMap, getGenresForMood, searchTracks, createPlaylist } from "./playlistGenerator.js";
+import { showMood, showPlaylist, showLoader, hideLoader } from "./display.js";
+import { setupMoodSelector } from "./moodSelector.js";
 
-await fetchAccessToken();
-initButtons();
+const videoEl = document.getElementById("webcam");
+const startBtn = document.getElementById("startBtn");
+const loginBtn = document.getElementById("loginBtn");
 
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then(stream => {
-    document.getElementById('webcam').srcObject = stream;
-  })
-  .catch(err => {
-    console.error("Webcam error:", err);
-  });
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadMoodMap();
 
-document.getElementById('detect-mood').addEventListener('click', async () => {
-  const mood = await detectMoodFromWebcam();
-  showMood(mood);
-  const token = getAccessToken();
-  if (!token) return alert('Login with Spotify first.');
-  const playlist = await generatePlaylist(mood, token);
-  displayPlaylist(playlist);
+  if (!getAccessToken()) {
+    loginBtn.style.display = "block";
+    startBtn.disabled = true;
+  } else {
+    loginBtn.style.display = "none";
+    startBtn.disabled = false;
+    startWebcam(videoEl);
+  }
 });
 
-document.getElementById('generate-playlist').addEventListener('click', async () => {
-  const mood = getSelectedMood();
-  showMood(mood);
-  const token = getAccessToken();
-  if (!token) return alert('Login with Spotify first.');
-  const playlist = await generatePlaylist(mood, token);
-  displayPlaylist(playlist);
+// Login Spotify
+loginBtn.addEventListener("click", () => {
+  loginWithSpotify();
+});
+
+startBtn.addEventListener("click", async () => {
+  try {
+    showLoader();
+
+    const snapshot = await captureSnapshot(videoEl);
+    const mood = await detectMoodFromImage(snapshot);
+
+    showMood(mood);
+
+    const genres = await getGenresForMood(mood);
+    const tracks = await searchTracks(genres);
+    const playlist = await createPlaylist(tracks, mood);
+
+    showPlaylist(playlist, tracks);
+  } catch (err) {
+    alert("Error: " + err.message);
+    console.error(err);
+  } finally {
+    hideLoader();
+  }
+});
+
+setupMoodSelector(async (mood) => {
+  try {
+    showLoader();
+    showMood(mood);
+
+    const genres = await getGenresForMood(mood);
+    const tracks = await searchTracks(genres);
+    const playlist = await createPlaylist(tracks, mood);
+    showPlaylist(playlist, tracks);
+  } catch (err) {
+    alert("Error: " + err.message);
+    console.error(err);
+  } finally {
+    hideLoader();
+  }
 });
