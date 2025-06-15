@@ -1,67 +1,39 @@
-// main.js
-import { loginWithSpotify, getAccessToken } from "./auth.js";
-import { startWebcam, captureSnapshot, detectMoodFromImage } from "./moodDetector.js";
-import { loadMoodMap, getGenresForMood, searchTracks, createPlaylist } from "./playlistGenerator.js";
-import { showMood, showPlaylist, showLoader, hideLoader } from "./display.js";
-import { setupMoodSelector } from "./moodSelector.js";
+import { setupMoodButtons } from './moodSelector.js';
+import { detectMoodFromWebcam } from './moodDetector.js';
+import { generatePlaylistForMood } from './playlistGenerator.js';
+import { displayMood, displayPlaylist, showLoader, hideLoader } from './display.js';
+import { getAccessToken } from './auth.js';
 
-const videoEl = document.getElementById("webcam");
-const startBtn = document.getElementById("startBtn");
-const loginBtn = document.getElementById("loginBtn");
+const webcamBtn = document.getElementById('detect-mood-btn');
+const manualMoodContainerId = 'manual-mood';
+const moodDisplayId = 'detected-mood';
+const playlistContainerId = 'playlist';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadMoodMap();
+function handleMood(mood) {
+  displayMood(mood, moodDisplayId);
+  showLoader();
+  getAccessToken().then(token => {
+    generatePlaylistForMood(mood, token).then(tracks => {
+      hideLoader();
+      displayPlaylist(tracks, playlistContainerId);
+    }).catch(err => {
+      hideLoader();
+      console.error('Playlist generation error:', err);
+    });
+  });
+}
 
-  if (!getAccessToken()) {
-    loginBtn.style.display = "block";
-    startBtn.disabled = true;
-  } else {
-    loginBtn.style.display = "none";
-    startBtn.disabled = false;
-    startWebcam(videoEl);
-  }
-});
+setupMoodButtons(manualMoodContainerId, handleMood);
 
-// Login Spotify
-loginBtn.addEventListener("click", () => {
-  loginWithSpotify();
-});
-
-startBtn.addEventListener("click", async () => {
-  try {
+if (webcamBtn) {
+  webcamBtn.addEventListener('click', () => {
     showLoader();
-
-    const snapshot = await captureSnapshot(videoEl);
-    const mood = await detectMoodFromImage(snapshot);
-
-    showMood(mood);
-
-    const genres = await getGenresForMood(mood);
-    const tracks = await searchTracks(genres);
-    const playlist = await createPlaylist(tracks, mood);
-
-    showPlaylist(playlist, tracks);
-  } catch (err) {
-    alert("Error: " + err.message);
-    console.error(err);
-  } finally {
-    hideLoader();
-  }
-});
-
-setupMoodSelector(async (mood) => {
-  try {
-    showLoader();
-    showMood(mood);
-
-    const genres = await getGenresForMood(mood);
-    const tracks = await searchTracks(genres);
-    const playlist = await createPlaylist(tracks, mood);
-    showPlaylist(playlist, tracks);
-  } catch (err) {
-    alert("Error: " + err.message);
-    console.error(err);
-  } finally {
-    hideLoader();
-  }
-});
+    detectMoodFromWebcam().then(mood => {
+      handleMood(mood);
+    }).catch(err => {
+      hideLoader();
+      alert('Webcam error or mood could not be detected.');
+      console.error(err);
+    });
+  });
+}

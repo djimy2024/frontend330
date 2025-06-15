@@ -14,22 +14,35 @@
     <p>Let your mood choose your music 🎧</p>
   </header>
 
-  <main>
-    <video id="webcam" autoplay muted playsinline style="width: 300px; border: 4px solid #4FC3F7; border-radius: 1rem;"></video>
-    
-    <div class="controls">
-      <button id="loginBtn">Login with Spotify</button>
-      <button id="startBtn" disabled>Start Mood Detection</button>
-    </div>
+ 
+   <main>
+  <section>
+      <h2>Detect Your Mood</h2>
+      <video id="webcam" autoplay muted playsinline width="320" height="240"></video>
+      <br />
+      <button id="detect-mood-btn">Detect Mood</button>
+      <p id="detected-mood"></p>
+    </section>
 
-    <div id="loader" class="loader" style="display:none;">🎵 Generating your playlist...</div>
-    <div id="moodResult" style="display:none;"></div>
-    <div id="playlistContainer"></div>
+    <section id="mood-manual">
+      <h2>Or Choose Your Mood</h2>
+      <div>
+        <button class="mood-btn" data-mood="happy">😊 Happy</button>
+        <button class="mood-btn" data-mood="sad">😢 Sad</button>
+        <button class="mood-btn" data-mood="angry">😡 Angry</button>
+        <button class="mood-btn" data-mood="neutral">😐 Neutral</button>
+      </div>
+    </section>
 
-    <div>
-  <h3>Or pick your mood manually:</h3>
-  <div id="moodSelector"></div>
-</div>
+    <section id="spotify-login">
+      <h2>Login with Spotify</h2>
+      <button id="login-btn">Login</button>
+    </section>
+
+    <section id="playlist-section">
+      <h2>Your Playlist</h2>
+      <div id="playlist"></div>
+    </section>
   </main>
 
   <footer>
@@ -37,6 +50,6 @@
    -- Frontend330/Final Project</p>
   </footer>
 
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>

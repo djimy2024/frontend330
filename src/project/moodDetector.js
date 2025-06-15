@@ -1,50 +1,47 @@
-// moodDetector.js
-const azureEndpoint = "https://YOUR_REGION.api.cognitive.microsoft.com/face/v1.0/detect";
-const azureKey = "YOUR_AZURE_FACE_API_KEY";
+const video = document.createElement('video');
+video.autoplay = true;
+video.playsInline = true;
 
-export async function startWebcam(videoElement) {
+const canvas = document.createElement('canvas');
+
+export async function initCamera(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoElement.srcObject = stream;
-    await videoElement.play();
+    video.srcObject = stream;
+    container.innerHTML = ''; 
+    container.appendChild(video);
   } catch (err) {
-    console.error("Webcam error:", err);
-    alert("Could not access webcam");
+    console.error('Kamera pa disponib:', err);
+    container.innerHTML = '<p>Kamera pa disponib. Tanpri bay aksè.</p>';
   }
 }
 
-export async function captureSnapshot(videoElement) {
-  const canvas = document.createElement("canvas");
-  canvas.width = videoElement.videoWidth;
-  canvas.height = videoElement.videoHeight;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(videoElement, 0, 0);
-  return canvas.toDataURL("image/jpeg");
-}
+export async function detectMood() {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
 
-export async function detectMoodFromImage(base64Image) {
-  const blob = await fetch(base64Image).then(res => res.blob());
+  const apiKey = 'YOUR_AZURE_FACE_API_KEY';
+  const endpoint = 'YOUR_AZURE_ENDPOINT';
 
-  const params = new URLSearchParams({
-    returnFaceAttributes: "emotion"
-  });
-
-  const response = await fetch(`${azureEndpoint}?${params}`, {
-    method: "POST",
+  const response = await fetch(`${endpoint}/face/v1.0/detect?returnFaceAttributes=emotion`, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/octet-stream",
-      "Ocp-Apim-Subscription-Key": azureKey
+      'Ocp-Apim-Subscription-Key': apiKey,
+      'Content-Type': 'application/octet-stream'
     },
-    body: await blob.arrayBuffer()
+    body: imageBlob
   });
 
-  const data = await response.json();
+  const result = await response.json();
+  if (!result.length) return 'neutral';
 
-  if (!data.length) {
-    throw new Error("No face detected");
-  }
-
-  const emotions = data[0].faceAttributes.emotion;
-  const topEmotion = Object.entries(emotions).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
-  return topEmotion;
+  const emotions = result[0].faceAttributes.emotion;
+  const sorted = Object.entries(emotions).sort((a, b) => b[1] - a[1]);
+  return sorted[0][0];
 }

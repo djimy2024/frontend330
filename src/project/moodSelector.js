@@ -1,15 +1,21 @@
 // moodSelector.js
-export function setupMoodSelector(onMoodSelected) {
-  const selector = document.getElementById("moodSelector");
-  const moods = ["happy", "sad", "angry", "neutral", "surprised", "fearful", "disgusted", "contempt"];
 
-  moods.forEach(mood => {
-    const btn = document.createElement("button");
-    btn.textContent = mood.charAt(0).toUpperCase() + mood.slice(1);
-    btn.className = "mood-btn";
-    btn.addEventListener("click", () => {
-      onMoodSelected(mood);
-    });
-    selector.appendChild(btn);
+import { detectMood } from './moodDetector.js';
+import { generatePlaylist } from './playlistGenerator.js';
+import { showMood, showTracks, showError } from './display.js';
+
+const moodButtons = document.querySelectorAll('.mood-btn');
+
+moodButtons.forEach(button => {
+  button.addEventListener('click', async () => {
+    const selectedMood = button.dataset.mood;
+    try {
+      showMood(selectedMood);
+      const tracks = await generatePlaylist(selectedMood);
+      showTracks(tracks);
+    } catch (error) {
+      showError('Failed to generate playlist. Try again later.');
+      console.error(error);
+    }
   });
-}
+});
