@@ -1,5 +1,5 @@
 // moodSelector.js
-import moodMap from './data/moodMap.json' assert { type: 'json' };
+import moodMap from './data/moodMap.json';
 
 const manualMoodSelector = document.getElementById('manualMoodSelector');
 

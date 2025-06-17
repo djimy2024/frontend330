@@ -5,29 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Music & Mood Matcher</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Optional: Add favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <!-- Optional: Better font rendering and accessibility -->
+  <meta name="theme-color" content="#3F3D56" />
 </head>
 <body>
   <header>
     <h1>Music & Mood Matcher</h1>
-    <button id="loginBtn">Login with Spotify</button>
+    <button id="loginBtn" aria-label="Login with Spotify">Login with Spotify</button>
+    <button id="logoutBtn" style="display: none;">Logout</button>
+
   </header>
 
   <main>
-    <section id="moodDetectionSection">
-      <h2>Detect Mood from Webcam</h2>
-      <video id="webcam" autoplay muted playsinline></video>
-      <button id="captureMoodBtn">Capture Mood</button>
-      <div id="detectedMood"></div>
-    </section>
+    <section id="moodDetectionSection" aria-labelledby="webcamSectionTitle">
+  <h2 id="webcamSectionTitle">Detect Mood from Webcam</h2>
 
-    <section id="manualMoodSection">
-      <h2>Or Select Your Mood Manually</h2>
+  <div class="webcam-container">
+    <video id="webcam" autoplay muted playsinline></video>
+    <button id="captureMoodBtn">Capture Mood</button>
+  </div>
+
+  <div id="detectedMood" role="status" aria-live="polite"></div>
+</section>
+
+    <section id="manualMoodSection" aria-labelledby="manualSectionTitle">
+      <h2 id="manualSectionTitle">Or Select Your Mood Manually</h2>
+      <label for="manualMoodSelector">Choose your mood:</label>
       <select id="manualMoodSelector"></select>
       <button id="generatePlaylistBtn">Generate Playlist</button>
     </section>
 
-    <section id="playlistSection">
-      <h2>Your Playlist</h2>
+    <section id="playlistSection" aria-labelledby="playlistSectionTitle">
+      <h2 id="playlistSectionTitle">Your Playlist</h2>
       <ul id="playlist"></ul>
     </section>
   </main>
