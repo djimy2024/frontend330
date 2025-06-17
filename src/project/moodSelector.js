@@ -1,21 +1,18 @@
 // moodSelector.js
+import moodMap from './data/moodMap.json' assert { type: 'json' };
 
-import { detectMood } from './moodDetector.js';
-import { generatePlaylist } from './playlistGenerator.js';
-import { showMood, showTracks, showError } from './display.js';
+const manualMoodSelector = document.getElementById('manualMoodSelector');
 
-const moodButtons = document.querySelectorAll('.mood-btn');
+export function populateMoodSelector() {
+  manualMoodSelector.innerHTML = '';
+  for (const mood in moodMap) {
+    const option = document.createElement('option');
+    option.value = mood;
+    option.textContent = mood.charAt(0).toUpperCase() + mood.slice(1);
+    manualMoodSelector.appendChild(option);
+  }
+}
 
-moodButtons.forEach(button => {
-  button.addEventListener('click', async () => {
-    const selectedMood = button.dataset.mood;
-    try {
-      showMood(selectedMood);
-      const tracks = await generatePlaylist(selectedMood);
-      showTracks(tracks);
-    } catch (error) {
-      showError('Failed to generate playlist. Try again later.');
-      console.error(error);
-    }
-  });
-});
+export function getSelectedMood() {
+  return manualMoodSelector.value;
+}

@@ -1,54 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Music & Mood Matcher</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Roboto&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>Music & Mood Matcher</h1>
-    <p>Let your mood choose your music 🎧</p>
+    <button id="loginBtn">Login with Spotify</button>
   </header>
 
- 
-   <main>
-  <section>
-      <h2>Detect Your Mood</h2>
-      <video id="webcam" autoplay muted playsinline width="320" height="240"></video>
-      <br />
-      <button id="detect-mood-btn">Detect Mood</button>
-      <p id="detected-mood"></p>
+  <main>
+    <section id="moodDetectionSection">
+      <h2>Detect Mood from Webcam</h2>
+      <video id="webcam" autoplay muted playsinline></video>
+      <button id="captureMoodBtn">Capture Mood</button>
+      <div id="detectedMood"></div>
     </section>
 
-    <section id="mood-manual">
-      <h2>Or Choose Your Mood</h2>
-      <div>
-        <button class="mood-btn" data-mood="happy">😊 Happy</button>
-        <button class="mood-btn" data-mood="sad">😢 Sad</button>
-        <button class="mood-btn" data-mood="angry">😡 Angry</button>
-        <button class="mood-btn" data-mood="neutral">😐 Neutral</button>
-      </div>
+    <section id="manualMoodSection">
+      <h2>Or Select Your Mood Manually</h2>
+      <select id="manualMoodSelector"></select>
+      <button id="generatePlaylistBtn">Generate Playlist</button>
     </section>
 
-    <section id="spotify-login">
-      <h2>Login with Spotify</h2>
-      <button id="login-btn">Login</button>
-    </section>
-
-    <section id="playlist-section">
+    <section id="playlistSection">
       <h2>Your Playlist</h2>
-      <div id="playlist"></div>
+      <ul id="playlist"></ul>
     </section>
   </main>
-
-  <footer>
-    <p>&copy; 2025 Djimy Francillon 
-   -- Frontend330/Final Project</p>
-  </footer>
 
   <script type="module" src="main.js"></script>
 </body>

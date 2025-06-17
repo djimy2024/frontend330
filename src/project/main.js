@@ -1,39 +1,59 @@
-import { setupMoodButtons } from './moodSelector.js';
-import { detectMoodFromWebcam } from './moodDetector.js';
-import { generatePlaylistForMood } from './playlistGenerator.js';
-import { displayMood, displayPlaylist, showLoader, hideLoader } from './display.js';
-import { getAccessToken } from './auth.js';
+// main.js
+import { login, getAccessToken, fetchAccessToken } from './auth.js';
+import { startWebcam, captureSnapshot, detectMood } from './moodDetector.js';
+import { populateMoodSelector, getSelectedMood } from './moodSelector.js';
+import { generatePlaylist } from './playlistGenerator.js';
+import { displayMood, displayPlaylist } from './display.js';
 
-const webcamBtn = document.getElementById('detect-mood-btn');
-const manualMoodContainerId = 'manual-mood';
-const moodDisplayId = 'detected-mood';
-const playlistContainerId = 'playlist';
+const loginBtn = document.getElementById('loginBtn');
+const captureMoodBtn = document.getElementById('captureMoodBtn');
+const generatePlaylistBtn = document.getElementById('generatePlaylistBtn');
 
-function handleMood(mood) {
-  displayMood(mood, moodDisplayId);
-  showLoader();
-  getAccessToken().then(token => {
-    generatePlaylistForMood(mood, token).then(tracks => {
-      hideLoader();
-      displayPlaylist(tracks, playlistContainerId);
-    }).catch(err => {
-      hideLoader();
-      console.error('Playlist generation error:', err);
-    });
-  });
+async function handleAuthRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('code')) {
+    const code = params.get('code');
+    try {
+      await fetchAccessToken(code);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      alert('Login successful!');
+    } catch (e) {
+      alert('Login failed: ' + e.message);
+    }
+  }
 }
 
-setupMoodButtons(manualMoodContainerId, handleMood);
+loginBtn.addEventListener('click', () => {
+  login();
+});
 
-if (webcamBtn) {
-  webcamBtn.addEventListener('click', () => {
-    showLoader();
-    detectMoodFromWebcam().then(mood => {
-      handleMood(mood);
-    }).catch(err => {
-      hideLoader();
-      alert('Webcam error or mood could not be detected.');
-      console.error(err);
-    });
-  });
+captureMoodBtn.addEventListener('click', async () => {
+  try {
+    const snapshot = captureSnapshot();
+    const mood = await detectMood(snapshot);
+    displayMood(mood);
+  } catch (err) {
+    alert('Mood detection failed: ' + err.message);
+  }
+});
+
+generatePlaylistBtn.addEventListener('click', async () => {
+  const mood = getSelectedMood();
+  try {
+    const tracks = await generatePlaylist(mood);
+    displayPlaylist(tracks);
+  } catch (err) {
+    alert('Playlist generation failed: ' + err.message);
+  }
+});
+
+async function init() {
+  await handleAuthRedirect();
+  if (getAccessToken()) {
+    loginBtn.style.display = 'none';
+  }
+  startWebcam();
+  populateMoodSelector();
 }
+
+init();

@@ -1,6 +1,8 @@
 {
-  "happy": ["pop", "dance"],
-  "sad": ["acoustic", "piano"],
-  "angry": ["metal", "rock"],
-  "neutral": ["chill", "ambient"]
+  "happy": ["pop", "dance", "happy"],
+  "sad": ["acoustic", "chill", "sad"],
+  "angry": ["rock", "metal", "hard-rock"],
+  "neutral": ["ambient", "jazz", "classical"],
+  "surprised": ["electronic", "indie", "alternative"],
+  "disgusted": ["punk", "grunge", "garage"]
 }

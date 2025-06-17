@@ -1,47 +1,61 @@
-const video = document.createElement('video');
-video.autoplay = true;
-video.playsInline = true;
+// moodDetector.js
+const videoElement = document.getElementById('webcam');
 
-const canvas = document.createElement('canvas');
-
-export async function initCamera(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
+export async function startWebcam() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-    container.innerHTML = ''; 
-    container.appendChild(video);
+    videoElement.srcObject = stream;
   } catch (err) {
-    console.error('Kamera pa disponib:', err);
-    container.innerHTML = '<p>Kamera pa disponib. Tanpri bay aksè.</p>';
+    console.error('Failed to start webcam', err);
   }
 }
 
-export async function detectMood() {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const context = canvas.getContext('2d');
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+// Take snapshot from video and convert to base64
+export function captureSnapshot() {
+  const canvas = document.createElement('canvas');
+  canvas.width = videoElement.videoWidth;
+  canvas.height = videoElement.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg');
+}
 
-  const apiKey = 'YOUR_AZURE_FACE_API_KEY';
-  const endpoint = 'YOUR_AZURE_ENDPOINT';
+// Call Azure Face API or other emotion detection service
+export async function detectMood(imageBase64) {
+  // Remove prefix 'data:image/jpeg;base64,'
+  const base64Data = imageBase64.split(',')[1];
 
-  const response = await fetch(`${endpoint}/face/v1.0/detect?returnFaceAttributes=emotion`, {
+  // Your Azure Face API details
+  const endpoint = 'YOUR_AZURE_FACE_API_ENDPOINT';
+  const subscriptionKey = 'YOUR_AZURE_SUBSCRIPTION_KEY';
+
+  const response = await fetch(endpoint + '/face/v1.0/detect?returnFaceAttributes=emotion', {
     method: 'POST',
     headers: {
-      'Ocp-Apim-Subscription-Key': apiKey,
-      'Content-Type': 'application/octet-stream'
+      'Content-Type': 'application/octet-stream',
+      'Ocp-Apim-Subscription-Key': subscriptionKey,
     },
-    body: imageBlob
+    body: Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)),
   });
 
-  const result = await response.json();
-  if (!result.length) return 'neutral';
+  if (!response.ok) {
+    throw new Error('Emotion detection failed');
+  }
 
-  const emotions = result[0].faceAttributes.emotion;
-  const sorted = Object.entries(emotions).sort((a, b) => b[1] - a[1]);
-  return sorted[0][0];
+  const faces = await response.json();
+
+  if (faces.length === 0) return 'neutral';
+
+  // Find emotion with highest confidence
+  const emotions = faces[0].faceAttributes.emotion;
+  let detectedMood = 'neutral';
+  let maxScore = 0;
+  for (const [emotion, score] of Object.entries(emotions)) {
+    if (score > maxScore) {
+      maxScore = score;
+      detectedMood = emotion;
+    }
+  }
+
+  return detectedMood;
 }

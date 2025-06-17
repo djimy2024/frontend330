@@ -1,84 +1,83 @@
+// auth.js
 const clientId = '1f71e98cfc8547a887a6e910df1e0e90';
-const redirectUri = 'https://djimy2024.github.io/frontend330/src/project/';
-const scope = 'playlist-modify-public';
+const redirectUri = 'https://djimy2024.github.io/frontend330/src/project/index.html';
+const scopes = ['playlist-modify-public', 'playlist-modify-private', 'user-read-email'];
 
-const codeVerifierKey = 'spotify_code_verifier';
-const tokenKey = 'spotify_access_token';
-
-// Generate a random string for code verifier
 function generateCodeVerifier(length = 128) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-  return Array.from(crypto.getRandomValues(new Uint8Array(length)))
-    .map(x => chars[x % chars.length])
-    .join('');
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = '';
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }
 
-// Generate code challenge from verifier
 async function generateCodeChallenge(verifier) {
-  const data = new TextEncoder().encode(verifier);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
   const digest = await crypto.subtle.digest('SHA-256', data);
   return btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
-// Redirect to Spotify login
-export async function redirectToLogin() {
-  const verifier = generateCodeVerifier();
-  const challenge = await generateCodeChallenge(verifier);
-  localStorage.setItem(codeVerifierKey, verifier);
+export async function login() {
+  const codeVerifier = generateCodeVerifier();
+  sessionStorage.setItem('code_verifier', codeVerifier);
 
-  const params = new URLSearchParams({
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+  const state = Math.random().toString(36).substring(2, 15);
+  const scope = scopes.join(' ');
+
+  const args = new URLSearchParams({
     response_type: 'code',
     client_id: clientId,
     scope,
     redirect_uri: redirectUri,
+    state,
     code_challenge_method: 'S256',
-    code_challenge: challenge
+    code_challenge: codeChallenge,
   });
 
-  window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+  window.location = 'https://accounts.spotify.com/authorize?' + args.toString();
 }
 
-// Exchange auth code for token
-async function fetchAccessToken(code, verifier) {
-  const params = new URLSearchParams({
+export async function fetchAccessToken(code) {
+  const codeVerifier = sessionStorage.getItem('code_verifier');
+
+  const body = new URLSearchParams({
+    client_id: clientId,
     grant_type: 'authorization_code',
     code,
     redirect_uri: redirectUri,
-    client_id: clientId,
-    code_verifier: verifier
+    code_verifier: codeVerifier,
   });
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: params.toString()
+    body: body.toString(),
   });
 
-  const data = await res.json();
+  const data = await response.json();
   if (data.access_token) {
-    localStorage.setItem(tokenKey, data.access_token);
+    localStorage.setItem('spotify_access_token', data.access_token);
+    localStorage.setItem('spotify_refresh_token', data.refresh_token);
     return data.access_token;
   } else {
-    throw new Error('Access token error: ' + JSON.stringify(data));
+    throw new Error('Failed to get access token');
   }
 }
 
-// Get access token from URL or storage
-export async function getAccessToken() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
-  const storedToken = localStorage.getItem(tokenKey);
+export function getAccessToken() {
+  return localStorage.getItem('spotify_access_token');
+}
 
-  if (storedToken) return storedToken;
-
-  if (code) {
-    const verifier = localStorage.getItem(codeVerifierKey);
-    return await fetchAccessToken(code, verifier);
-  }
-
-  // If not logged in, redirect
-  await redirectToLogin();
+export function logout() {
+  localStorage.removeItem('spotify_access_token');
+  localStorage.removeItem('spotify_refresh_token');
 }
