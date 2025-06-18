@@ -66,7 +66,6 @@ export async function fetchAccessToken(code) {
   const data = await response.json();
   if (data.access_token) {
     localStorage.setItem('spotify_access_token', data.access_token);
-    localStorage.setItem('spotify_refresh_token', data.refresh_token);
     return data.access_token;
   } else {
     throw new Error('Failed to get access token');
@@ -79,5 +78,6 @@ export function getAccessToken() {
 
 export function logout() {
   localStorage.removeItem('spotify_access_token');
-  localStorage.removeItem('spotify_refresh_token');
+  localStorage.removeItem('spotify_refresh_token'); 
+  sessionStorage.removeItem('code_verifier'); 
 }

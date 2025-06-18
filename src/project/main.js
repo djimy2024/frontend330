@@ -1,4 +1,4 @@
-import { login, getAccessToken, fetchAccessToken } from './auth.js';
+import { login, logout, getAccessToken, fetchAccessToken } from './auth.js';
 import { startWebcam, captureSnapshot, detectMood } from './moodDetector.js';
 import { populateMoodSelector, getSelectedMood } from './moodSelector.js';
 import { generatePlaylist } from './playlistGenerator.js';
@@ -11,28 +11,11 @@ const logoutBtn = document.getElementById('logoutBtn');
 const captureMoodBtn = document.getElementById('captureMoodBtn');
 const generatePlaylistBtn = document.getElementById('generatePlaylistBtn');
 
-// Handle redirect from Spotify login
-async function handleAuthRedirect() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('code')) {
-    const code = params.get('code');
-    try {
-      await fetchAccessToken(code);
-      window.history.replaceState({}, document.title, window.location.pathname);
-      alert('Login successful!');
-    } catch (e) {
-      alert('Login failed: ' + e.message);
-    }
-  }
-}
-
-// Event listeners
 loginBtn.addEventListener('click', () => login());
 
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('spotify_access_token');
-  localStorage.removeItem('spotify_refresh_token');
-  window.location.href = window.location.pathname; // clean reload
+  logout();
+  window.location.href = window.location.pathname;
 });
 
 captureMoodBtn.addEventListener('click', async () => {
@@ -61,22 +44,40 @@ generatePlaylistBtn.addEventListener('click', async () => {
   }
 });
 
-// Initialize app
+async function handleAuthRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('code')) {
+    const code = params.get('code');
+    console.log('🔁 Code from redirect:', code);
+    try {
+      await fetchAccessToken(code);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      alert('Login successful!');
+      startWebcam(); // ← ajoute sa la!
+    } catch (e) {
+      console.error('❌ Error fetching token:', e);
+      alert('Login failed: ' + e.message);
+    }
+  }
+}
+
 async function init() {
   await handleAuthRedirect();
 
   const token = getAccessToken();
   if (token) {
-    console.log('✅ Access token detected');
+    console.log('✅ Access token found');
     loginBtn.style.display = 'none';
     logoutBtn.style.display = 'inline-block';
-    startWebcam();
-    populateMoodSelector();
   } else {
     console.warn('🚫 No access token found');
     loginBtn.style.display = 'inline-block';
     logoutBtn.style.display = 'none';
   }
+
+  startWebcam();  
+  populateMoodSelector();
 }
+
 
 init();

@@ -5,33 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Music & Mood Matcher</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Optional: Add favicon -->
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
-
-  <!-- Optional: Better font rendering and accessibility -->
   <meta name="theme-color" content="#3F3D56" />
 </head>
 <body>
   <header>
     <h1>Music & Mood Matcher</h1>
     <button id="loginBtn" aria-label="Login with Spotify">Login with Spotify</button>
-    <button id="logoutBtn" style="display: none;">Logout</button>
-
+    <button id="logoutBtn">Logout</button>
   </header>
 
   <main>
+    <!-- Mood Detection Section -->
     <section id="moodDetectionSection" aria-labelledby="webcamSectionTitle">
-  <h2 id="webcamSectionTitle">Detect Mood from Webcam</h2>
+      <h2 id="webcamSectionTitle">Detect Mood from Webcam</h2>
+      
+      <div class="webcam-container">
+        <video id="webcam" autoplay muted playsinline></video>
+      </div>
 
-  <div class="webcam-container">
-    <video id="webcam" autoplay muted playsinline></video>
-    <button id="captureMoodBtn">Capture Mood</button>
-  </div>
+      <button id="captureMoodBtn">Capture Mood</button>
 
-  <div id="detectedMood" role="status" aria-live="polite"></div>
-</section>
+      <div id="moodLoader" style="display: none;">🎥 Detecting mood...</div>
+      <div id="detectedMood" role="status" aria-live="polite"></div>
+    </section>
 
+    <!-- Manual Mood Selection Section -->
     <section id="manualMoodSection" aria-labelledby="manualSectionTitle">
       <h2 id="manualSectionTitle">Or Select Your Mood Manually</h2>
       <label for="manualMoodSelector">Choose your mood:</label>
@@ -39,12 +38,14 @@
       <button id="generatePlaylistBtn">Generate Playlist</button>
     </section>
 
+    <!-- Playlist Display Section -->
     <section id="playlistSection" aria-labelledby="playlistSectionTitle">
       <h2 id="playlistSectionTitle">Your Playlist</h2>
+      <div id="playlistLoader" style="display: none;">🎵 Loading playlist...</div>
       <ul id="playlist"></ul>
     </section>
   </main>
 
-  <script type="module" src="main.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

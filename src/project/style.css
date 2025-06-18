@@ -1,4 +1,3 @@
-
 :root {
   --primary-color: #3F3D56;
   --accent-color: #4FC3F7;
@@ -34,6 +33,17 @@ header, footer {
 header h1 {
   font-family: 'Inter', sans-serif;
   font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+#loginBtn, #logoutBtn {
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+}
+
+#logoutBtn{
+    visibility: hidden;
 }
 
 main {
@@ -61,13 +71,6 @@ h2 {
   color: var(--primary-color);
 }
 
-video {
-  border: 4px solid var(--accent-color);
-  border-radius: 12px;
-  animation: borderPulse 2s infinite;
-  max-width: 100%;
-}
-
 .webcam-container {
   display: flex;
   flex-direction: column;
@@ -78,15 +81,17 @@ video {
 #webcam {
   width: 100%;
   max-width: 400px;
-  border: 4px solid #3F3D56;
+  border: 4px solid var(--accent-color);
   border-radius: 12px;
+  animation: borderPulse 2s infinite;
 }
 
-#captureMoodBtn {
+#captureMoodBtn,
+#generatePlaylistBtn {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
-  background-color: #4FC3F7;
+  background-color: var(--accent-color);
   border: none;
   border-radius: 8px;
   color: white;
@@ -94,16 +99,40 @@ video {
   transition: background-color 0.3s ease;
 }
 
-#captureMoodBtn:hover {
+#captureMoodBtn:hover,
+#generatePlaylistBtn:hover {
   background-color: #039BE5;
 }
 
-
-@keyframes borderPulse {
-  0% { border-color: var(--accent-color); }
-  50% { border-color: var(--primary-color); }
-  100% { border-color: var(--accent-color); }
+#moodLoader,
+#playlistLoader {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  animation: fadeIn 0.3s ease-in-out;
 }
+
+#manualMoodSelector {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  width: 80%;
+  max-width: 300px;
+}
+
+#detectedMood {
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-top: 1rem;
+  transition: color 0.3s ease;
+}
+
+.mood-happy { color: var(--happy-color); }
+.mood-sad { color: var(--sad-color); }
+.mood-angry { color: var(--angry-color); }
+.mood-neutral { color: var(--neutral-color); }
 
 button, .mood-btn {
   background-color: var(--accent-color);
@@ -119,20 +148,6 @@ button, .mood-btn {
 
 button:hover, .mood-btn:hover {
   background-color: #00bcd4;
-}
-
-.mood-btn {
-  margin: 0.3rem;
-  padding: 0.5rem 1rem;
-  border-radius: 1.5rem;
-  font-weight: bold;
-}
-
-#playlist {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
 }
 
 .track {
@@ -155,21 +170,28 @@ button:hover, .mood-btn:hover {
   margin-bottom: 0.5rem;
 }
 
-#detected-mood {
-  font-weight: bold;
-  font-size: 1.25rem;
+#playlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
-  transition: color 0.3s ease;
 }
-
-.mood-happy { color: var(--happy-color); }
-.mood-sad { color: var(--sad-color); }
-.mood-angry { color: var(--angry-color); }
-.mood-neutral { color: var(--neutral-color); }
 
 footer {
   font-size: 0.9rem;
   margin-top: auto;
+}
+
+/* Animations */
+@keyframes borderPulse {
+  0% { border-color: var(--accent-color); }
+  50% { border-color: var(--primary-color); }
+  100% { border-color: var(--accent-color); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Responsive */
@@ -178,12 +200,20 @@ footer {
     padding: 1rem;
   }
 
-  .track {
-    flex-direction: column;
-    align-items: flex-start;
+  section {
+    padding: 1.5rem;
   }
 
-  .track img {
-    margin-bottom: 0.5rem;
+  #webcam {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  #manualMoodSelector {
+    width: 100%;
   }
 }

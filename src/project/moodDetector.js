@@ -2,13 +2,21 @@
 const videoElement = document.getElementById('webcam');
 
 export async function startWebcam() {
+  const video = document.getElementById('webcam');
+  if (!video) {
+    console.warn('Webcam element not found!');
+    return;
+  }
+
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoElement.srcObject = stream;
+    video.srcObject = stream;
   } catch (err) {
-    console.error('Failed to start webcam', err);
+    console.error('Error accessing webcam:', err);
+    alert('Unable to access webcam: ' + err.message);
   }
 }
+
 
 // Take snapshot from video and convert to base64
 export function captureSnapshot() {
@@ -57,5 +65,5 @@ export async function detectMood(imageBase64) {
     }
   }
 
-  return detectedMood;
+  return detectMood;
 }
