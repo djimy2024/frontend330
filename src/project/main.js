@@ -53,7 +53,7 @@ async function handleAuthRedirect() {
       await fetchAccessToken(code);
       window.history.replaceState({}, document.title, window.location.pathname);
       alert('Login successful!');
-      startWebcam(); // ← ajoute sa la!
+      startWebcam(); 
     } catch (e) {
       console.error('❌ Error fetching token:', e);
       alert('Login failed: ' + e.message);
